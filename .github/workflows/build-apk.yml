@@ -1,0 +1,61 @@
+name: Build Android Debug APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Organize project files into proper directories
+        run: |
+          mkdir -p app/src/main/java/com/example/smartaudioalarm
+          mkdir -p app/src/main/res/layout
+          mkdir -p app/src/main/res/values
+          [ -f AlarmItem.kt ] && mv AlarmItem.kt app/src/main/java/com/example/smartaudioalarm/ || true
+          [ -f AppSettings.kt ] && mv AppSettings.kt app/src/main/java/com/example/smartaudioalarm/ || true
+          [ -f AlarmStorage.kt ] && mv AlarmStorage.kt app/src/main/java/com/example/smartaudioalarm/ || true
+          [ -f AlarmScheduler.kt ] && mv AlarmScheduler.kt app/src/main/java/com/example/smartaudioalarm/ || true
+          [ -f AlarmReceiver.kt ] && mv AlarmReceiver.kt app/src/main/java/com/example/smartaudioalarm/ || true
+          [ -f BootReceiver.kt ] && mv BootReceiver.kt app/src/main/java/com/example/smartaudioalarm/ || true
+          [ -f AudioAlarmService.kt ] && mv AudioAlarmService.kt app/src/main/java/com/example/smartaudioalarm/ || true
+          [ -f AlarmAdapter.kt ] && mv AlarmAdapter.kt app/src/main/java/com/example/smartaudioalarm/ || true
+          [ -f MainActivity.kt ] && mv MainActivity.kt app/src/main/java/com/example/smartaudioalarm/ || true
+          [ -f AndroidManifest.xml ] && mv AndroidManifest.xml app/src/main/ || true
+          [ -f proguard-rules.pro ] && mv proguard-rules.pro app/ || true
+          [ -f activity_main.xml ] && mv activity_main.xml app/src/main/res/layout/ || true
+          [ -f item_alarm.xml ] && mv item_alarm.xml app/src/main/res/layout/ || true
+          [ -f themes.xml ] && mv themes.xml app/src/main/res/values/ || true
+          if [ ! -f app/build.gradle.kts ] && [ -f build.gradle.kts ]; then
+            cp build.gradle.kts app/build.gradle.kts
+          fi
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Grant execute permission for gradle wrapper
+        run: |
+          gradle wrapper --gradle-version 8.7
+          chmod +x gradlew
+
+      - name: Build APK
+        run: ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SmartAudioAlarm-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
+          
