@@ -13,11 +13,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Organize project files into proper directories
+      - name: Organize project files and Gradle setup
         run: |
           mkdir -p app/src/main/java/com/example/smartaudioalarm
           mkdir -p app/src/main/res/layout
           mkdir -p app/src/main/res/values
+
           [ -f AlarmItem.kt ] && mv AlarmItem.kt app/src/main/java/com/example/smartaudioalarm/ || true
           [ -f AppSettings.kt ] && mv AppSettings.kt app/src/main/java/com/example/smartaudioalarm/ || true
           [ -f AlarmStorage.kt ] && mv AlarmStorage.kt app/src/main/java/com/example/smartaudioalarm/ || true
@@ -32,8 +33,68 @@ jobs:
           [ -f activity_main.xml ] && mv activity_main.xml app/src/main/res/layout/ || true
           [ -f item_alarm.xml ] && mv item_alarm.xml app/src/main/res/layout/ || true
           [ -f themes.xml ] && mv themes.xml app/src/main/res/values/ || true
-          if [ ! -f app/build.gradle.kts ] && [ -f build.gradle.kts ]; then
-            cp build.gradle.kts app/build.gradle.kts
+                    cat << 'EOF' > settings.gradle.kts
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = "SmartAudioAlarm"
+          include(":app")
+          EOF
+
+          cat << 'EOF' > build.gradle.kts
+          plugins {
+              id("com.android.application") version "8.5.2" apply false
+              id("org.jetbrains.kotlin.android") version "1.9.24" apply false
+          }
+          EOF
+
+          if [ ! -f app/build.gradle.kts ]; then
+            if [ -f build.gradle.kts.1 ]; then
+              mv build.gradle.kts.1 app/build.gradle.kts
+            else
+              cat << 'EOF' > app/build.gradle.kts
+              plugins {
+                  id("com.android.application")
+                  id("org.jetbrains.kotlin.android")
+              }
+              android {
+                  namespace = "com.example.smartaudioalarm"
+                  compileSdk = 34
+                  defaultConfig {
+                      applicationId = "com.example.smartaudioalarm"
+                      minSdk = 24
+                      targetSdk = 34
+                      versionCode = 1
+                      versionName = "1.0"
+                  }
+                  compileOptions {
+                      sourceCompatibility = JavaVersion.VERSION_17
+                      targetCompatibility = JavaVersion.VERSION_17
+                  }
+                  kotlinOptions {
+                      jvmTarget = "17"
+                  }
+              }
+              dependencies {
+                  implementation("androidx.core:core-ktx:1.13.1")
+                  implementation("androidx.appcompat:appcompat:1.7.0")
+                  implementation("com.google.android.material:material:1.12.0")
+                  implementation("androidx.recyclerview:recyclerview:1.3.2")
+                  implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+              }
+              EOF
+            fi
           fi
 
       - name: Set up JDK 17
@@ -51,7 +112,7 @@ jobs:
           chmod +x gradlew
 
       - name: Build APK
-        run: ./gradlew assembleDebug
+        run: ./gradlew :app:assembleDebug
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
