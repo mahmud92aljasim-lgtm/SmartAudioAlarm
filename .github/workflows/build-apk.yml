@@ -20,7 +20,8 @@ jobs:
           mv AndroidManifest.xml app/src/main/ 2>/dev/null || true
           mv proguard-rules.pro app/ 2>/dev/null || true
           [ -f build.gradle.kts ] && cp build.gradle.kts app/build.gradle.kts || true
-          printf 'rootProject.name = "SmartAudioAlarm"\ninclude(":app")\n' > settings.gradle.kts
+          rm -f settings.gradle.kts build.gradle.kts
+          printf 'pluginManagement {\n  repositories {\n    google()\n    mavenCentral()\n    gradlePluginPortal()\n  }\n}\ndependencyResolutionManagement {\n  repositories {\n    google()\n    mavenCentral()\n  }\n}\nrootProject.name = "SmartAudioAlarm"\ninclude(":app")\n' > settings.gradle.kts
           printf 'plugins {\n  id("com.android.application") version "8.5.2" apply false\n  id("org.jetbrains.kotlin.android") version "1.9.24" apply false\n}\n' > build.gradle.kts
 
       - uses: actions/setup-java@v4
