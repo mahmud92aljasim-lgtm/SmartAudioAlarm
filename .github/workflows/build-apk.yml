@@ -19,10 +19,10 @@ jobs:
           mv themes.xml app/src/main/res/values/ 2>/dev/null || true
           mv AndroidManifest.xml app/src/main/ 2>/dev/null || true
           mv proguard-rules.pro app/ 2>/dev/null || true
-          [ -f build.gradle.kts ] && cp build.gradle.kts app/build.gradle.kts || true
           rm -f settings.gradle.kts build.gradle.kts
           printf 'pluginManagement {\n  repositories {\n    google()\n    mavenCentral()\n    gradlePluginPortal()\n  }\n}\ndependencyResolutionManagement {\n  repositories {\n    google()\n    mavenCentral()\n  }\n}\nrootProject.name = "SmartAudioAlarm"\ninclude(":app")\n' > settings.gradle.kts
           printf 'plugins {\n  id("com.android.application") version "8.5.2" apply false\n  id("org.jetbrains.kotlin.android") version "1.9.24" apply false\n}\n' > build.gradle.kts
+          printf 'plugins {\n  id("com.android.application")\n  id("org.jetbrains.kotlin.android")\n}\nandroid {\n  namespace = "com.example.smartaudioalarm"\n  compileSdk = 34\n  defaultConfig {\n    applicationId = "com.example.smartaudioalarm"\n    minSdk = 24\n    targetSdk = 34\n    versionCode = 1\n    versionName = "1.0"\n  }\n  compileOptions {\n    sourceCompatibility = JavaVersion.VERSION_17\n    targetCompatibility = JavaVersion.VERSION_17\n  }\n  kotlinOptions {\n    jvmTarget = "17"\n  }\n}\ndependencies {\n  implementation("androidx.core:core-ktx:1.13.1")\n  implementation("androidx.appcompat:appcompat:1.7.0")\n  implementation("com.google.android.material:material:1.12.0")\n  implementation("androidx.recyclerview:recyclerview:1.3.2")\n  implementation("androidx.constraintlayout:constraintlayout:2.1.4")\n}\n' > app/build.gradle.kts
 
       - uses: actions/setup-java@v4
         with:
