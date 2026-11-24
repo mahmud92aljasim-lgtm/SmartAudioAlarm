@@ -8,114 +8,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Organize project files and Gradle setup
+      - name: Setup project structure
         run: |
-          mkdir -p app/src/main/java/com/example/smartaudioalarm
-          mkdir -p app/src/main/res/layout
-          mkdir -p app/src/main/res/values
+          mkdir -p app/src/main/java/com/example/smartaudioalarm app/src/main/res/layout app/src/main/res/values
+          mv *.kt app/src/main/java/com/example/smartaudioalarm/ 2>/dev/null || true
+          mv activity_main.xml item_alarm.xml app/src/main/res/layout/ 2>/dev/null || true
+          mv themes.xml app/src/main/res/values/ 2>/dev/null || true
+          mv AndroidManifest.xml app/src/main/ 2>/dev/null || true
+          mv proguard-rules.pro app/ 2>/dev/null || true
+          [ -f build.gradle.kts ] && cp build.gradle.kts app/build.gradle.kts || true
+          printf 'rootProject.name = "SmartAudioAlarm"\ninclude(":app")\n' > settings.gradle.kts
+          printf 'plugins {\n  id("com.android.application") version "8.5.2" apply false\n  id("org.jetbrains.kotlin.android") version "1.9.24" apply false\n}\n' > build.gradle.kts
 
-          [ -f AlarmItem.kt ] && mv AlarmItem.kt app/src/main/java/com/example/smartaudioalarm/ || true
-          [ -f AppSettings.kt ] && mv AppSettings.kt app/src/main/java/com/example/smartaudioalarm/ || true
-          [ -f AlarmStorage.kt ] && mv AlarmStorage.kt app/src/main/java/com/example/smartaudioalarm/ || true
-          [ -f AlarmScheduler.kt ] && mv AlarmScheduler.kt app/src/main/java/com/example/smartaudioalarm/ || true
-          [ -f AlarmReceiver.kt ] && mv AlarmReceiver.kt app/src/main/java/com/example/smartaudioalarm/ || true
-          [ -f BootReceiver.kt ] && mv BootReceiver.kt app/src/main/java/com/example/smartaudioalarm/ || true
-          [ -f AudioAlarmService.kt ] && mv AudioAlarmService.kt app/src/main/java/com/example/smartaudioalarm/ || true
-          [ -f AlarmAdapter.kt ] && mv AlarmAdapter.kt app/src/main/java/com/example/smartaudioalarm/ || true
-          [ -f MainActivity.kt ] && mv MainActivity.kt app/src/main/java/com/example/smartaudioalarm/ || true
-          [ -f AndroidManifest.xml ] && mv AndroidManifest.xml app/src/main/ || true
-          [ -f proguard-rules.pro ] && mv proguard-rules.pro app/ || true
-          [ -f activity_main.xml ] && mv activity_main.xml app/src/main/res/layout/ || true
-          [ -f item_alarm.xml ] && mv item_alarm.xml app/src/main/res/layout/ || true
-          [ -f themes.xml ] && mv themes.xml app/src/main/res/values/ || true
-                    cat << 'EOF' > settings.gradle.kts
-          pluginManagement {
-              repositories {
-                  google()
-                  mavenCentral()
-                  gradlePluginPortal()
-              }
-          }
-          dependencyResolutionManagement {
-              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
-          }
-          rootProject.name = "SmartAudioAlarm"
-          include(":app")
-          EOF
-
-          cat << 'EOF' > build.gradle.kts
-          plugins {
-              id("com.android.application") version "8.5.2" apply false
-              id("org.jetbrains.kotlin.android") version "1.9.24" apply false
-          }
-          EOF
-
-          if [ ! -f app/build.gradle.kts ]; then
-            if [ -f build.gradle.kts.1 ]; then
-              mv build.gradle.kts.1 app/build.gradle.kts
-            else
-              cat << 'EOF' > app/build.gradle.kts
-              plugins {
-                  id("com.android.application")
-                  id("org.jetbrains.kotlin.android")
-              }
-              android {
-                  namespace = "com.example.smartaudioalarm"
-                  compileSdk = 34
-                  defaultConfig {
-                      applicationId = "com.example.smartaudioalarm"
-                      minSdk = 24
-                      targetSdk = 34
-                      versionCode = 1
-                      versionName = "1.0"
-                  }
-                  compileOptions {
-                      sourceCompatibility = JavaVersion.VERSION_17
-                      targetCompatibility = JavaVersion.VERSION_17
-                  }
-                  kotlinOptions {
-                      jvmTarget = "17"
-                  }
-              }
-              dependencies {
-                  implementation("androidx.core:core-ktx:1.13.1")
-                  implementation("androidx.appcompat:appcompat:1.7.0")
-                  implementation("com.google.android.material:material:1.12.0")
-                  implementation("androidx.recyclerview:recyclerview:1.3.2")
-                  implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-              }
-              EOF
-            fi
-          fi
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@v3
 
-      - name: Grant execute permission for gradle wrapper
+      - name: Build APK
         run: |
           gradle wrapper --gradle-version 8.7
           chmod +x gradlew
+          ./gradlew :app:assembleDebug
 
-      - name: Build APK
-        run: ./gradlew :app:assembleDebug
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: SmartAudioAlarm-APK
           path: app/build/outputs/apk/debug/app-debug.apk
