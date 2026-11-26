@@ -1,47 +1,187 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://android.com"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#040914"
+    android:orientation="vertical"
+    android:padding="16dp">
 
-    <LinearLayout
+    <!-- القسم العلوي: الدائرة الكبيرة والدوائر الفرعية -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="340dp">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/topAppBar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:title="منبه الصوت (12 ساعة)" />
+        <!-- الدائرة المركزية الكبيرة -->
+        <FrameLayout
+            android:id="@+id/centerHudContainer"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_centerInParent="true">
 
-        <TextView
-            android:id="@+id/tvEmptyState"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            <com.example.smartaudioalarm.HudClockView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <!-- الوقت مع الثواني -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="bottom"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvMainTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="monospace"
+                        android:shadowColor="#00F0FF"
+                        android:shadowRadius="15"
+                        android:text="12:00"
+                        android:textColor="#00F0FF"
+                        android:textSize="36sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvSeconds"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:fontFamily="monospace"
+                        android:text=":00"
+                        android:textColor="#80F8FF"
+                        android:textSize="18sp" />
+                </LinearLayout>
+
+                <!-- التاريخ أسفل الوقت -->
+                <TextView
+                    android:id="@+id/tvDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:fontFamily="monospace"
+                    android:text="2026-11-26"
+                    android:textColor="#B2EBF2"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- دائرة صغيرة 1: مؤشر عدد المنبهات النشطة (أعلى اليسار) -->
+        <LinearLayout
+            android:id="@+id/nodeStatus"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_hud_node"
             android:gravity="center"
-            android:padding="32dp"
-            android:text="لا توجد منبهات حالياً. اضغط على زر + لإضافة منبه صوتي."
-            android:textSize="16sp"
-            android:visibility="gone" />
+            android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvAlarms"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="12dp"
-            android:clipToPadding="false" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/tvActiveCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="0"
+                android:textColor="#00F0FF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabAddAlarm"
-        android:layout_width="wrap_content"
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="منبهات"
+                android:textColor="#80F8FF"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <!-- دائرة صغيرة 2: زر الإعدادات (أعلى اليمين) -->
+        <LinearLayout
+            android:id="@+id/btnHudSettings"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_hud_node"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⚙"
+                android:textColor="#00F0FF"
+                android:textSize="22sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ضبط"
+                android:textColor="#80F8FF"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <!-- دائرة صغيرة 3: زر إضافة منبه جديد (أسفل اليمين) -->
+        <LinearLayout
+            android:id="@+id/fabAddAlarm"
+            android:layout_width="82dp"
+            android:layout_height="82dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="6dp"
+            android:background="@drawable/bg_hud_node"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+"
+                android:textColor="#00F0FF"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="إضافة"
+                android:textColor="#80F8FF"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <!-- نص الحالة عند عدم وجود منبهات -->
+    <TextView
+        android:id="@+id/tvEmptyState"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:contentDescription="إضافة منبه"
-        app:srcCompat="@android:drawable/ic_input_add" />
+        android:gravity="center"
+        android:padding="20dp"
+        android:text="لا توجد منبهات نشطة • اضغط على دائرة الإضافة"
+        android:textColor="#4DD0E1"
+        android:textSize="14sp"
+        android:visibility="gone" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <!-- قائمة المنبهات المضافة -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAlarms"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingTop="8dp" />
+
+</LinearLayout>
