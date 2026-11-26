@@ -316,6 +316,8 @@ private fun showTimePicker12Hour(initialHour: Int, initialMinute: Int, existingA
 
     private fun updateEmptyState() {
         tvEmptyState.visibility = if (alarms.isEmpty()) View.VISIBLE else View.GONE
+        tvActiveCount.text = alarms.count { it.isEnabled }.toString()
+        
     }
 
     private fun queryDisplayName(uri: Uri): String? {
@@ -329,8 +331,4 @@ private fun showTimePicker12Hour(initialHour: Int, initialMinute: Int, existingA
     }
 }
 
-  private fun updateEmptyState() {
-        tvEmptyState.visibility = if (alarms.isEmpty()) View.VISIBLE else View.GONE
-        tvActiveCount.text = alarms.count { it.isEnabled }.toString()
-    }
-    
+  
