@@ -13,11 +13,16 @@ class HudClockView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : View(context, attrs) {
 
+    private val outerHalo = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.parseColor("#3300F0FF")
+        style = Paint.Style.STROKE
+        strokeWidth = 18f
+    }
+
     private val cyanGlow = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#00F0FF")
         style = Paint.Style.STROKE
         strokeWidth = 5f
-        setShadowLayer(18f, 0f, 0f, Color.parseColor("#00F0FF"))
     }
 
     private val dashedRing = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -34,24 +39,29 @@ class HudClockView @JvmOverloads constructor(
 
     private var angle = 0f
 
-    init {
-        setLayerType(LAYER_TYPE_SOFTWARE, null)
-    }
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val cx = width / 2f
         val cy = height / 2f
         val r = (min(width, height) / 2f) - 25f
+        if (r <= 0f) return
 
+        // 1. تعبئة داخلية شفافة
         canvas.drawCircle(cx, cy, r * 0.86f, innerFill)
+
+        // 2. هالة التوهج الخارجي السريعة
+        canvas.drawCircle(cx, cy, r, outerHalo)
+
+        // 3. الحلقة الخارجية الحادة
         canvas.drawCircle(cx, cy, r, cyanGlow)
 
+        // 4. الحلقة المقطعة الدوارة
         canvas.save()
         canvas.rotate(angle, cx, cy)
         canvas.drawCircle(cx, cy, r * 0.89f, dashedRing)
         canvas.restore()
 
+        // 5. نقطة الثواني المضيئة
         val sec = Calendar.getInstance().get(Calendar.SECOND)
         val secAngle = Math.toRadians(((sec * 6f) - 90f).toDouble())
         val dotX = cx + (r * 0.95f) * cos(secAngle).toFloat()
@@ -61,7 +71,7 @@ class HudClockView @JvmOverloads constructor(
         canvas.drawCircle(dotX, dotY, 9f, cyanGlow)
         cyanGlow.style = Paint.Style.STROKE
 
-        angle = (angle + 0.4f) % 360f
-        postInvalidateDelayed(30)
+        angle = (angle + 1.2f) % 360f
+        postInvalidateDelayed(50)
     }
 }
