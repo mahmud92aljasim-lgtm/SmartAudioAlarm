@@ -56,6 +56,20 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+                Thread.setDefaultUncaughtExceptionHandler { _, throwable ->
+            val errorMsg = android.util.Log.getStackTraceString(throwable)
+            runOnUiThread {
+                AlertDialog.Builder(this)
+                    .setTitle("سبب توقف التطبيق")
+                    .setMessage(errorMsg.take(600))
+                    .setPositiveButton("نسخ الخطأ") { _, _ ->
+                        val cb = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                        cb.setPrimaryClip(android.content.ClipData.newPlainText("err", errorMsg))
+                    }
+                    .show()
+            }
+            Thread.sleep(4000)
+                }
         setContentView(R.layout.activity_main)
 
         tvMainTime = findViewById(R.id.tvMainTime)
