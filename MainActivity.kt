@@ -326,9 +326,23 @@ private fun showTimePicker12Hour(initialHour: Int, initialMinute: Int, existingA
         }
     }
 
-    private fun updateEmptyState() {
+        private fun updateEmptyState() {
         tvEmptyState.visibility = if (alarms.isEmpty()) View.VISIBLE else View.GONE
-        tvActiveCount.text = alarms.count { it.isEnabled }.toString()
+        val activeAlarms = alarms.filter { it.isEnabled }
+        tvActiveCount.text = activeAlarms.size.toString()
+
+        val tvNext = findViewById<TextView>(R.id.tvNextAlarmTime)
+        val firstActive = activeAlarms.firstOrNull()
+        if (firstActive != null) {
+            val h = firstActive.hourOfDay
+            val m = firstActive.minute
+            val amPm = if (h >= 12) "PM" else "AM"
+            val h12 = if (h % 12 == 0) 12 else h % 12
+            tvNext.text = String.format(java.util.Locale.ENGLISH, "%02d:%02d %s", h12, m, amPm)
+        } else {
+            tvNext.text = "--:--"
+        }
+        }
         
     }
 
