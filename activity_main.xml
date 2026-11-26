@@ -8,8 +8,9 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="340dp">
+        android:layout_height="350dp">
 
+        <!-- الدائرة المركزية الكبيرة -->
         <FrameLayout
             android:id="@+id/centerHudContainer"
             android:layout_width="250dp"
@@ -27,10 +28,12 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
+                <!-- الوقت مع الثواني بترتيب صحيح -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="bottom"
+                    android:layoutDirection="ltr"
                     android:orientation="horizontal">
 
                     <TextView
@@ -40,41 +43,43 @@
                         android:fontFamily="monospace"
                         android:shadowColor="#00F0FF"
                         android:shadowRadius="15"
-                        android:text="12:00"
+                        android:text="12:00 PM"
                         android:textColor="#00F0FF"
-                        android:textSize="34sp"
+                        android:textSize="25sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvSeconds"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
+                        android:layout_marginStart="3dp"
                         android:fontFamily="monospace"
                         android:text=":00"
                         android:textColor="#80F8FF"
-                        android:textSize="18sp" />
+                        android:textSize="15sp" />
                 </LinearLayout>
 
+                <!-- التاريخ أسفل الوقت -->
                 <TextView
                     android:id="@+id/tvDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="8dp"
                     android:fontFamily="monospace"
                     android:text="2026-11-26"
                     android:textColor="#B2EBF2"
-                    android:textSize="13sp" />
+                    android:textSize="12sp" />
             </LinearLayout>
         </FrameLayout>
 
+        <!-- دائرة 1 (أعلى اليمين/اليسار): عدد المنبهات النشطة -->
         <LinearLayout
             android:id="@+id/nodeStatus"
             android:layout_width="76dp"
             android:layout_height="76dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_margin="6dp"
+            android:layout_margin="4dp"
             android:background="@drawable/bg_hud_node"
             android:gravity="center"
             android:orientation="vertical">
@@ -97,13 +102,14 @@
                 android:textSize="10sp" />
         </LinearLayout>
 
+        <!-- دائرة 2 (أعلى المقابل): زر الإعدادات -->
         <LinearLayout
             android:id="@+id/btnHudSettings"
             android:layout_width="76dp"
             android:layout_height="76dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_margin="6dp"
+            android:layout_margin="4dp"
             android:background="@drawable/bg_hud_node"
             android:clickable="true"
             android:focusable="true"
@@ -125,13 +131,44 @@
                 android:textSize="10sp" />
         </LinearLayout>
 
+        <!-- دائرة 3 (أسفل المقابل): مؤشر المنبه القادم -->
+        <LinearLayout
+            android:id="@+id/nodeNextAlarm"
+            android:layout_width="78dp"
+            android:layout_height="78dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="4dp"
+            android:background="@drawable/bg_hud_node"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvNextAlarmTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="--:--"
+                android:textColor="#00F0FF"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="القادم"
+                android:textColor="#80F8FF"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <!-- دائرة 4 (أسفل): زر إضافة منبه جديد -->
         <LinearLayout
             android:id="@+id/fabAddAlarm"
-            android:layout_width="82dp"
-            android:layout_height="82dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
-            android:layout_margin="6dp"
+            android:layout_margin="4dp"
             android:background="@drawable/bg_hud_node"
             android:clickable="true"
             android:focusable="true"
@@ -161,10 +198,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:padding="20dp"
+        android:padding="16dp"
         android:text="لا توجد منبهات نشطة • اضغط على دائرة الإضافة"
         android:textColor="#4DD0E1"
-        android:textSize="14sp"
+        android:textSize="13sp"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -173,6 +210,6 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:clipToPadding="false"
-        android:paddingTop="8dp" />
+        android:paddingTop="6dp" />
 
 </LinearLayout>
