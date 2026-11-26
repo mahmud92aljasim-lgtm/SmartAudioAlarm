@@ -13,10 +13,11 @@ jobs:
 
       - name: Setup project structure
         run: |
-          mkdir -p app/src/main/java/com/example/smartaudioalarm app/src/main/res/layout app/src/main/res/values
+          mkdir -p app/src/main/java/com/example/smartaudioalarm app/src/main/res/layout app/src/main/res/values app/src/main/res/drawable
           mv *.kt app/src/main/java/com/example/smartaudioalarm/ 2>/dev/null || true
           mv activity_main.xml item_alarm.xml app/src/main/res/layout/ 2>/dev/null || true
           mv themes.xml app/src/main/res/values/ 2>/dev/null || true
+          mv ic_launcher.png app/src/main/res/drawable/ 2>/dev/null || true
           mv AndroidManifest.xml app/src/main/ 2>/dev/null || true
           mv proguard-rules.pro app/ 2>/dev/null || true
           rm -f settings.gradle.kts build.gradle.kts
