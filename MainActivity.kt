@@ -56,7 +56,19 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+                try {
+            setContentView(R.layout.activity_main)
+        } catch (e: Throwable) {
+            val tv = TextView(this).apply {
+                text = android.util.Log.getStackTraceString(e)
+                setTextColor(android.graphics.Color.WHITE)
+                setBackgroundColor(android.graphics.Color.BLACK)
+                setPadding(30, 80, 30, 30)
+            }
+            setContentView(ScrollView(this).apply { addView(tv) })
+            return
+                }
+                
 
         tvMainTime = findViewById(R.id.tvMainTime)
         tvSeconds = findViewById(R.id.tvSeconds)
