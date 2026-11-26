@@ -344,8 +344,6 @@ private fun showTimePicker12Hour(initialHour: Int, initialMinute: Int, existingA
         }
         }
         
-    }
-
     private fun queryDisplayName(uri: Uri): String? {
         contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
