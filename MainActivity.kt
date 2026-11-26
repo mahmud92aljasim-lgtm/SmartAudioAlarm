@@ -48,16 +48,23 @@ class MainActivity : AppCompatActivity() {
         promptLabelAndSave(pendingHourOfDay, pendingMinute, uri, title)
     }
 
+        private val clockHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private lateinit var tvMainTime: TextView
+    private lateinit var tvSeconds: TextView
+    private lateinit var tvDate: TextView
+    private lateinit var tvActiveCount: TextView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val toolbar = findViewById<MaterialToolbar>(R.id.topAppBar)
-        setSupportActionBar(toolbar)
-
+        tvMainTime = findViewById(R.id.tvMainTime)
+        tvSeconds = findViewById(R.id.tvSeconds)
+        tvDate = findViewById(R.id.tvDate)
+        tvActiveCount = findViewById(R.id.tvActiveCount)
         tvEmptyState = findViewById(R.id.tvEmptyState)
-        alarms.addAll(AlarmStorage.loadAlarms(this))
 
+        alarms.addAll(AlarmStorage.loadAlarms(this)) 
         val rvAlarms = findViewById<RecyclerView>(R.id.rvAlarms)
         adapter = AlarmAdapter(
             items = alarms,
@@ -65,6 +72,7 @@ class MainActivity : AppCompatActivity() {
                 AlarmStorage.saveAlarms(this, alarms)
                 if (isEnabled) AlarmScheduler.schedule(this, alarm)
                 else AlarmScheduler.cancel(this, alarm.id)
+                updateEmptyState()
             },
             onEdit = { alarm, index ->
                 editingAlarmIndex = index
@@ -79,26 +87,37 @@ class MainActivity : AppCompatActivity() {
         rvAlarms.adapter = adapter
         updateEmptyState()
 
-        findViewById<FloatingActionButton>(R.id.fabAddAlarm).setOnClickListener {
+        // زر الإضافة الدائري
+        findViewById<View>(R.id.fabAddAlarm).setOnClickListener {
             editingAlarmIndex = null
             showTimePicker12Hour(7, 0, null)
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menu.add(0, 1, 0, "⚙️ الإعدادات").setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == 1) {
+        // زر الإعدادات الدائري
+        findViewById<View>(R.id.btnHudSettings).setOnClickListener {
             showSettingsDialog()
-            return true
         }
-        return super.onOptionsItemSelected(item)
+
+        startLiveClock()
     }
 
-    private fun showTimePicker12Hour(initialHour: Int, initialMinute: Int, existingAlarm: AlarmItem?) {
+    private fun startLiveClock() {
+        val timeFmt = java.text.SimpleDateFormat("hh:mm a", java.util.Locale.ENGLISH)
+        val secFmt = java.text.SimpleDateFormat(":ss", java.util.Locale.ENGLISH)
+        val dateFmt = java.text.SimpleDateFormat("EEE • dd MMM yyyy", java.util.Locale.ENGLISH)
+
+        clockHandler.post(object : Runnable {
+            override fun run() {
+                val now = java.util.Date()
+                tvMainTime.text = timeFmt.format(now)
+                tvSeconds.text = secFmt.format(now)
+                tvDate.text = dateFmt.format(now)
+                clockHandler.postDelayed(this, 1000)
+            }
+        })
+    }
+    
+private fun showTimePicker12Hour(initialHour: Int, initialMinute: Int, existingAlarm: AlarmItem?) {
         val picker = MaterialTimePicker.Builder()
             .setTimeFormat(TimeFormat.CLOCK_12H)
             .setHour(initialHour)
@@ -309,3 +328,9 @@ class MainActivity : AppCompatActivity() {
         return null
     }
 }
+
+  private fun updateEmptyState() {
+        tvEmptyState.visibility = if (alarms.isEmpty()) View.VISIBLE else View.GONE
+        tvActiveCount.text = alarms.count { it.isEnabled }.toString()
+    }
+    
